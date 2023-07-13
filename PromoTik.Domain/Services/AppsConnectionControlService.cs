@@ -14,33 +14,37 @@ namespace PromoTik.Domain.Services
     {
         public async Task<bool> PublishMessageToApps(PublishChatMessage publishChatMessage)
         {
-            var client = new HttpClient();
-            var request = new HttpRequestMessage();
+            try
+            {
+                var client = new HttpClient();
+                var request = new HttpRequestMessage();
 
-            if (publishChatMessage.PublishingApps!.ToList().Exists(x => x.PublishingAppID == 1))
-            {
-                request = GetRequest_Telegram(publishChatMessage);
-            }
-            else
-            {
+                if (publishChatMessage.PublishingApps!.ToList().Exists(x => x.PublishingAppID == 1))
+                {
+                    request = GetRequest_Telegram(publishChatMessage);
+                }
+                else
+                {
+                    return false;
+                }
+
+                using (var response = await client.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    if (!string.IsNullOrWhiteSpace(responseString))
+                    {
+                        JObject responseJSON = JObject.Parse(responseString);
+
+                        return responseJSON["ok"]?.ToObject<bool>() ?? false;
+                    }
+                }
+
                 return false;
             }
-
-            using (var response = await client.SendAsync(request))
-            {
-                response.EnsureSuccessStatusCode();
-
-                var responseString = await response.Content.ReadAsStringAsync();
-
-                if (!string.IsNullOrWhiteSpace(responseString))
-                {
-                    JObject responseJSON = JObject.Parse(responseString);
-
-                    return responseJSON["ok"]?.ToObject<bool>() ?? false;
-                }
-            }
-
-            return false;
+            catch { throw; }
         }
 
         private HttpRequestMessage GetRequest_Telegram(PublishChatMessage publishChatMessage)
@@ -68,10 +72,10 @@ namespace PromoTik.Domain.Services
 
             if (!string.IsNullOrWhiteSpace(publishChatMessage.AditionalMessage))
             {
-                caption.AppendLine($"🔔 <b>{publishChatMessage.AditionalMessage}</b>");
+                caption.AppendLine($"💥 <b>{publishChatMessage.AditionalMessage}</b> 💥");
                 caption.AppendLine();
             }
-            
+
             caption.AppendLine(publishChatMessage.Title);
             caption.AppendLine();
             caption.AppendLine($"🔒 De: <s>{string.Format(new CultureInfo("pt-PT"), "{0:C}", publishChatMessage.ValueWithouDiscount)}</s>");

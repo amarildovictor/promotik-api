@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PromoTik.Data.Context;
 using PromoTik.Data.Repositories;
+using PromoTik.Data.Repositories.Scheduled;
 using PromoTik.Domain.Entities.Auth;
 using PromoTik.Domain.Interfaces.Repositories;
+using PromoTik.Domain.Interfaces.Repositories.Scheduled;
 using PromoTik.Domain.Interfaces.Services;
+using PromoTik.Domain.Interfaces.Services.Scheduled;
 using PromoTik.Domain.Services;
+using PromoTik.Domain.Services.Scheduled;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +21,11 @@ builder.Services.AddDbContext<DataContext>(
 builder.Services.AddScoped<IPublishChatMessageRepo, PublishChatMessageRepo>();
 builder.Services.AddScoped<IPublishChatMessageService, PublishChatMessageService>();
 builder.Services.AddScoped<IAppsConnectionControlService, AppsConnectionControlService>();
+builder.Services.AddScoped<IGeneralConfigurationRepo, GeneralConfigurationRepo>();
+builder.Services.AddScoped<ILineExecutionRepo, LineExecutionRepo>();
+builder.Services.AddScoped<ILineExecutionService, LineExecutionService>();
+
+builder.Services.AddHostedService<TimedHostedService>();
 
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {

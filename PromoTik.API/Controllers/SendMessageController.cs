@@ -11,7 +11,7 @@ using PromoTik.Domain.Interfaces.Services;
 namespace PromoTik.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class SendMessageController : ControllerBase
     {
         private readonly IPublishChatMessageService PublishChatMessageService;
@@ -29,7 +29,7 @@ namespace PromoTik.API.Controllers
                 if (!await PublishChatMessageService.Add(publishChatMessage))
                     return NotFound("Não foi possível adicionar ou enviar a mensagem a um dos apps informados, verifique os dados.");
 
-                return Ok("Message enviada com sucesso.");
+                return Ok("Messagem enviada com sucesso.");
             }
             catch (Exception ex)
             {
