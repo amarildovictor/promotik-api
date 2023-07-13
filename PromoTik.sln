@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromoTik.API", "PromoTik.API\PromoTik.API.csproj", "{A312EB0A-9E07-487F-821E-58BD2810AC79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromoTik.Data", "PromoTik.Data\PromoTik.Data.csproj", "{FBF72D31-DDDA-4219-B6EF-88883F6468B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromoTik.Domain", "PromoTik.Domain\PromoTik.Domain.csproj", "{4A8D46FB-9EC8-48BF-A9E7-D29ADF95CA76}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A312EB0A-9E07-487F-821E-58BD2810AC79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A312EB0A-9E07-487F-821E-58BD2810AC79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A312EB0A-9E07-487F-821E-58BD2810AC79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A312EB0A-9E07-487F-821E-58BD2810AC79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBF72D31-DDDA-4219-B6EF-88883F6468B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF72D31-DDDA-4219-B6EF-88883F6468B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF72D31-DDDA-4219-B6EF-88883F6468B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF72D31-DDDA-4219-B6EF-88883F6468B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A8D46FB-9EC8-48BF-A9E7-D29ADF95CA76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A8D46FB-9EC8-48BF-A9E7-D29ADF95CA76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A8D46FB-9EC8-48BF-A9E7-D29ADF95CA76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A8D46FB-9EC8-48BF-A9E7-D29ADF95CA76}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
