@@ -70,7 +70,7 @@ namespace PromoTik.Domain.Services.Scheduled
                     IAppsConnectionControlService appsConnectionControlService;
                     appsConnectionControlService = scope.ServiceProvider.GetRequiredService<IAppsConnectionControlService>();
 
-                    if (await appsConnectionControlService.PublishMessageToApps(lineExecution.PublishChatMessage))
+                    if (await appsConnectionControlService.PublishMessageToApps(lineExecution.PublishChatMessage) == null)
                     {
                         lineExecutionService.UpdateExecution(lineExecution.ID);
                     }

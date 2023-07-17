@@ -8,7 +8,7 @@ namespace PromoTik.Domain.Interfaces.Services
 {
     public interface IPublishChatMessageService
     {
-        Task<bool> Add(PublishChatMessage publishChatMessage);
+        Task<List<string>?> Add(PublishChatMessage publishChatMessage);
 
         Task Remove(int publishChatMessageID);
 

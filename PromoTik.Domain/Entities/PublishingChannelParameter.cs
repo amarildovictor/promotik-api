@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace PromoTik.Domain.Entities
 {
-    public class PublishingApp
+    public class PublishingChannelParameter
     {
         public int ID { get; set; }
 
-        public required string Description { get; set; }
+        public required string Parameter { get; set; }
 
-        public required string EndpointUrl { get; set; }
+        public required string Value { get; set; }
     }
 }

@@ -26,8 +26,9 @@ namespace PromoTik.API.Controllers
         {
             try
             {
-                if (!await PublishChatMessageService.Add(publishChatMessage))
-                    return NotFound("Não foi possível adicionar ou enviar a mensagem a um dos apps informados, verifique os dados.");
+                List<string>? message = await PublishChatMessageService.Add(publishChatMessage);
+                if (message != null)
+                    return NotFound(message);
 
                 return Ok("Messagem enviada com sucesso.");
             }

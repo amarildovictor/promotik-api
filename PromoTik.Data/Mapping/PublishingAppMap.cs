@@ -16,7 +16,8 @@ namespace PromoTik.Data.Mapping
 
             builder.HasKey(x => x.ID);
 
-            builder.Property(x => x.Description);
+            builder.Property(x => x.Description).HasMaxLength(256);
+            builder.Property(x => x.EndpointUrl).HasMaxLength(256);
         }
     }
 }

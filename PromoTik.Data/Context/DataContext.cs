@@ -18,11 +18,15 @@ namespace PromoTik.Data.Context
 
         public DbSet<PublishChatMessage>? PublishChatMessage { get; set; }
 
-        public DbSet<PublishingApp>? PublishingApp { get; set; }
+        public DbSet<PublishingChannel>? PublishingChannel { get; set; }
+
+        public DbSet<PublishingChannelParameter>? PublishingChannelParameters { get; set; }
+
+        public DbSet<PublishingApp>? PublishingApps { get; set; }
 
         public DbSet<Warehouse>? Warehouse { get; set; }
 
-        public DbSet<PublishChatMessage_PublishingApp>? PublishChatMessage_PublishingApps { get; set; }
+        public DbSet<PublishChatMessage_PublishingChannel>? PublishChatMessage_PublishingChannels { get; set; }
 
         public DbSet<PublishChatMessage_Warehouse>? publishChatMessage_Warehouses { get; set; }
 
@@ -39,6 +43,8 @@ namespace PromoTik.Data.Context
             modelBuilder.ApplyConfiguration(new PublishChatMessageMap());
             modelBuilder.ApplyConfiguration(new PublishChatMessage_PublishingAppMap());
             modelBuilder.ApplyConfiguration(new PublishChatMessage_WarehouseMap());
+            modelBuilder.ApplyConfiguration(new PublishingChannelMap());
+            modelBuilder.ApplyConfiguration(new PublishingChannelParametersMap());
             modelBuilder.ApplyConfiguration(new PublishingAppMap());
             modelBuilder.ApplyConfiguration(new WarehouseMap());
             modelBuilder.ApplyConfiguration(new GeneralConfigurationMap());

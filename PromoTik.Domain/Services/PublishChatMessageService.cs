@@ -19,7 +19,7 @@ namespace PromoTik.Domain.Services
             this.PublishChatMessageRepo = publishChatMessageRepo;
         }
 
-        public async Task<bool> Add(PublishChatMessage publishChatMessage)
+        public async Task<List<string>?> Add(PublishChatMessage publishChatMessage)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace PromoTik.Domain.Services
                     return await AppsConnectionControlService.PublishMessageToApps(addedPublishChatMessage);
                 }
 
-                return false;
+                return null;
             }
             catch { throw; }
         }

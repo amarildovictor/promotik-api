@@ -19,10 +19,11 @@ builder.Services.AddDbContext<DataContext>(
 );
 
 builder.Services.AddScoped<IPublishChatMessageRepo, PublishChatMessageRepo>();
-builder.Services.AddScoped<IPublishChatMessageService, PublishChatMessageService>();
-builder.Services.AddScoped<IAppsConnectionControlService, AppsConnectionControlService>();
 builder.Services.AddScoped<IGeneralConfigurationRepo, GeneralConfigurationRepo>();
 builder.Services.AddScoped<ILineExecutionRepo, LineExecutionRepo>();
+builder.Services.AddScoped<IPublishingChannelRepo, PublishingChannelRepo>();
+builder.Services.AddScoped<IPublishChatMessageService, PublishChatMessageService>();
+builder.Services.AddScoped<IAppsConnectionControlService, AppsConnectionControlService>();
 builder.Services.AddScoped<ILineExecutionService, LineExecutionService>();
 
 builder.Services.AddHostedService<TimedHostedService>();

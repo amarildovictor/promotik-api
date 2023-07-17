@@ -18,7 +18,7 @@ namespace PromoTik.Domain.Entities
 
         public ICollection<PublishChatMessage_Warehouse>? Warehouses { get; set; }
 
-        public ICollection<PublishChatMessage_PublishingApp>? PublishingApps { get; set; }
+        public ICollection<PublishChatMessage_PublishingChannel>? PublishingChannels { get; set; }
 
         public string? ImageLink { get; set; }
 

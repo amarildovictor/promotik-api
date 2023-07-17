@@ -24,7 +24,7 @@ namespace PromoTik.Data.Repositories.Scheduled
             return Context?
                     .LineExecutions?
                     .Include(i => i.PublishChatMessage)
-                    .Include(i => i.PublishChatMessage.PublishingApps)
+                    .Include(i => i.PublishChatMessage.PublishingChannels)
                     .Include(i => i.PublishChatMessage.Warehouses)
                     .Where(w => w.ExecutionDate == null)
                     .OrderBy(x => x.CreationDate)

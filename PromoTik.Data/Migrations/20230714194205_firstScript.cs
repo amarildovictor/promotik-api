@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PromoTik.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstMigration : Migration
+    public partial class firstScript : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,6 +53,22 @@ namespace PromoTik.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GENERAL_CONFIGURATION",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Value1 = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Value2 = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GENERAL_CONFIGURATION", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PUBLISH_CHAT_MESSAGE",
                 columns: table => new
                 {
@@ -78,7 +94,8 @@ namespace PromoTik.Data.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    EndpointUrl = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -205,25 +222,44 @@ namespace PromoTik.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PUBLISHCHATMESSAGE_PUBLISHINGAPP",
+                name: "LINE_EXECUTION",
                 columns: table => new
                 {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     PublishChatMessageID = table.Column<int>(type: "int", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExecutionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Type = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LINE_EXECUTION", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_LINE_EXECUTION_PUBLISH_CHAT_MESSAGE_PublishChatMessageID",
+                        column: x => x.PublishChatMessageID,
+                        principalTable: "PUBLISH_CHAT_MESSAGE",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PUBLISHING_CHANNEL",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Channel_ID = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     PublishingAppID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PUBLISHCHATMESSAGE_PUBLISHINGAPP", x => new { x.PublishChatMessageID, x.PublishingAppID });
+                    table.PrimaryKey("PK_PUBLISHING_CHANNEL", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PUBLISHING_APP_PublishingAppID",
+                        name: "FK_PUBLISHING_CHANNEL_PUBLISHING_APP_PublishingAppID",
                         column: x => x.PublishingAppID,
                         principalTable: "PUBLISHING_APP",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PUBLISH_CHAT_MESSAGE_PublishChatMessageID",
-                        column: x => x.PublishChatMessageID,
-                        principalTable: "PUBLISH_CHAT_MESSAGE",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -250,6 +286,70 @@ namespace PromoTik.Data.Migrations
                         principalTable: "WAREHOUSE",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SCHEDULED_LINE_EXECUTION",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScheduledDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LineExecutionID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SCHEDULED_LINE_EXECUTION", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_SCHEDULED_LINE_EXECUTION_LINE_EXECUTION_LineExecutionID",
+                        column: x => x.LineExecutionID,
+                        principalTable: "LINE_EXECUTION",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PUBLISHCHATMESSAGE_PUBLISHINGAPP",
+                columns: table => new
+                {
+                    PublishChatMessageID = table.Column<int>(type: "int", nullable: false),
+                    PublishingAppID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PUBLISHCHATMESSAGE_PUBLISHINGAPP", x => new { x.PublishChatMessageID, x.PublishingAppID });
+                    table.ForeignKey(
+                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PUBLISHING_CHANNEL_PublishingAppID",
+                        column: x => x.PublishingAppID,
+                        principalTable: "PUBLISHING_CHANNEL",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PUBLISH_CHAT_MESSAGE_PublishChatMessageID",
+                        column: x => x.PublishChatMessageID,
+                        principalTable: "PUBLISH_CHAT_MESSAGE",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PUBLISHING_CHANNEL_PARAMETERS",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Parameter = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PublishingChannelID = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PUBLISHING_CHANNEL_PARAMETERS", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_PUBLISHING_CHANNEL_PARAMETERS_PUBLISHING_CHANNEL_PublishingChannelID",
+                        column: x => x.PublishingChannelID,
+                        principalTable: "PUBLISHING_CHANNEL",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateIndex(
@@ -292,6 +392,11 @@ namespace PromoTik.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LINE_EXECUTION_PublishChatMessageID",
+                table: "LINE_EXECUTION",
+                column: "PublishChatMessageID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PublishingAppID",
                 table: "PUBLISHCHATMESSAGE_PUBLISHINGAPP",
                 column: "PublishingAppID");
@@ -300,6 +405,21 @@ namespace PromoTik.Data.Migrations
                 name: "IX_PUBLISHCHATMESSAGE_WAREHOUSE_WarehouseID",
                 table: "PUBLISHCHATMESSAGE_WAREHOUSE",
                 column: "WarehouseID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PUBLISHING_CHANNEL_PublishingAppID",
+                table: "PUBLISHING_CHANNEL",
+                column: "PublishingAppID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PUBLISHING_CHANNEL_PARAMETERS_PublishingChannelID",
+                table: "PUBLISHING_CHANNEL_PARAMETERS",
+                column: "PublishingChannelID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SCHEDULED_LINE_EXECUTION_LineExecutionID",
+                table: "SCHEDULED_LINE_EXECUTION",
+                column: "LineExecutionID");
         }
 
         /// <inheritdoc />
@@ -321,10 +441,19 @@ namespace PromoTik.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "GENERAL_CONFIGURATION");
+
+            migrationBuilder.DropTable(
                 name: "PUBLISHCHATMESSAGE_PUBLISHINGAPP");
 
             migrationBuilder.DropTable(
                 name: "PUBLISHCHATMESSAGE_WAREHOUSE");
+
+            migrationBuilder.DropTable(
+                name: "PUBLISHING_CHANNEL_PARAMETERS");
+
+            migrationBuilder.DropTable(
+                name: "SCHEDULED_LINE_EXECUTION");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -333,13 +462,19 @@ namespace PromoTik.Data.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "WAREHOUSE");
+
+            migrationBuilder.DropTable(
+                name: "PUBLISHING_CHANNEL");
+
+            migrationBuilder.DropTable(
+                name: "LINE_EXECUTION");
+
+            migrationBuilder.DropTable(
                 name: "PUBLISHING_APP");
 
             migrationBuilder.DropTable(
                 name: "PUBLISH_CHAT_MESSAGE");
-
-            migrationBuilder.DropTable(
-                name: "WAREHOUSE");
         }
     }
 }

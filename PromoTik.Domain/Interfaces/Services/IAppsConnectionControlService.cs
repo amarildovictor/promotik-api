@@ -8,6 +8,6 @@ namespace PromoTik.Domain.Interfaces.Services
 {
     public interface IAppsConnectionControlService
     {
-        Task<bool> PublishMessageToApps(PublishChatMessage publishChatMessage);
+        Task<List<string>?> PublishMessageToApps(PublishChatMessage publishChatMessage);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PromoTik.Domain.Entities
 {
-    public class PublishChatMessage_PublishingApp
+    public class PublishChatMessage_PublishingChannel
     {
         [JsonIgnore]
         public int PublishChatMessageID { get; set; }
@@ -17,6 +17,6 @@ namespace PromoTik.Domain.Entities
         public PublishChatMessage? PublishChatMessage { get; set; }
 
         [JsonIgnore]
-        public PublishingApp? PublishingApp { get; set; }
+        public PublishingChannel? PublishingChannel { get; set; }
     }
 }

@@ -299,7 +299,7 @@ namespace PromoTik.Data.Migrations
                     b.ToTable("PUBLISH_CHAT_MESSAGE", (string)null);
                 });
 
-            modelBuilder.Entity("PromoTik.Domain.Entities.PublishChatMessage_PublishingApp", b =>
+            modelBuilder.Entity("PromoTik.Domain.Entities.PublishChatMessage_PublishingChannel", b =>
                 {
                     b.Property<int>("PublishChatMessageID")
                         .HasColumnType("int");
@@ -339,11 +339,72 @@ namespace PromoTik.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("EndpointUrl")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("ID");
 
                     b.ToTable("PUBLISHING_APP", (string)null);
+                });
+
+            modelBuilder.Entity("PromoTik.Domain.Entities.PublishingChannel", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Channel_ID")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("PublishingAppID")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PublishingAppID");
+
+                    b.ToTable("PUBLISHING_CHANNEL", (string)null);
+                });
+
+            modelBuilder.Entity("PromoTik.Domain.Entities.PublishingChannelParameter", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Parameter")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("PublishingChannelID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PublishingChannelID");
+
+                    b.ToTable("PUBLISHING_CHANNEL_PARAMETERS", (string)null);
                 });
 
             modelBuilder.Entity("PromoTik.Domain.Entities.Scheduled.LineExecution", b =>
@@ -462,15 +523,15 @@ namespace PromoTik.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PromoTik.Domain.Entities.PublishChatMessage_PublishingApp", b =>
+            modelBuilder.Entity("PromoTik.Domain.Entities.PublishChatMessage_PublishingChannel", b =>
                 {
                     b.HasOne("PromoTik.Domain.Entities.PublishChatMessage", "PublishChatMessage")
-                        .WithMany("PublishingApps")
+                        .WithMany("PublishingChannels")
                         .HasForeignKey("PublishChatMessageID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PromoTik.Domain.Entities.PublishingApp", "PublishingApp")
+                    b.HasOne("PromoTik.Domain.Entities.PublishingChannel", "PublishingChannel")
                         .WithMany("PublishChatMessages")
                         .HasForeignKey("PublishingAppID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -478,7 +539,7 @@ namespace PromoTik.Data.Migrations
 
                     b.Navigation("PublishChatMessage");
 
-                    b.Navigation("PublishingApp");
+                    b.Navigation("PublishingChannel");
                 });
 
             modelBuilder.Entity("PromoTik.Domain.Entities.PublishChatMessage_Warehouse", b =>
@@ -498,6 +559,24 @@ namespace PromoTik.Data.Migrations
                     b.Navigation("PublishChatMessage");
 
                     b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("PromoTik.Domain.Entities.PublishingChannel", b =>
+                {
+                    b.HasOne("PromoTik.Domain.Entities.PublishingApp", "PublishingApp")
+                        .WithMany()
+                        .HasForeignKey("PublishingAppID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PublishingApp");
+                });
+
+            modelBuilder.Entity("PromoTik.Domain.Entities.PublishingChannelParameter", b =>
+                {
+                    b.HasOne("PromoTik.Domain.Entities.PublishingChannel", null)
+                        .WithMany("PublishingChannelParameters")
+                        .HasForeignKey("PublishingChannelID");
                 });
 
             modelBuilder.Entity("PromoTik.Domain.Entities.Scheduled.LineExecution", b =>
@@ -524,14 +603,16 @@ namespace PromoTik.Data.Migrations
 
             modelBuilder.Entity("PromoTik.Domain.Entities.PublishChatMessage", b =>
                 {
-                    b.Navigation("PublishingApps");
+                    b.Navigation("PublishingChannels");
 
                     b.Navigation("Warehouses");
                 });
 
-            modelBuilder.Entity("PromoTik.Domain.Entities.PublishingApp", b =>
+            modelBuilder.Entity("PromoTik.Domain.Entities.PublishingChannel", b =>
                 {
                     b.Navigation("PublishChatMessages");
+
+                    b.Navigation("PublishingChannelParameters");
                 });
 
             modelBuilder.Entity("PromoTik.Domain.Entities.Warehouse", b =>
