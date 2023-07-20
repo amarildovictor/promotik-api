@@ -15,7 +15,5 @@ namespace PromoTik.Domain.Interfaces.Services.Scheduled
         LineExecution? Add(LineExecution lineExecution);
 
         LineExecution? Update(LineExecution lineExecution);
-
-        LineExecution? UpdateExecution(int ID);
     }
 }

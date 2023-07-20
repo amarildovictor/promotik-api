@@ -101,7 +101,10 @@ namespace PromoTik.Domain.Services
                                     href = $"https://www.amazon.es{href}&tag={amazonTag}";
                                     _ = decimal.TryParse(price?.Replace("€", "").Trim(), out decimal priceParse);
 
-                                    if (priceParse > 0 && !publishChatMessages.Exists(x => x.Title == title))
+                                    if (!string.IsNullOrWhiteSpace(title) &&
+                                        !string.IsNullOrWhiteSpace(imageUri) &&
+                                        priceParse > 0 &&
+                                        !publishChatMessages.Exists(x => x.Title == title))
                                     {
                                         publishChatMessages.Add(new PublishChatMessage
                                         {
@@ -142,13 +145,13 @@ namespace PromoTik.Domain.Services
         private string GetParameters(PublishChatMessage publishChatMessage, PublishingChannel publishingChannel)
         {
             List<PublishingChannelParameter> publishingChannelParameters = publishingChannel.PublishingChannelParameters ?? new List<PublishingChannelParameter>();
-            string? photo = publishChatMessage.ImageLink;
+            string photo = publishChatMessage.ImageLink ?? string.Empty;
             string? caption = GetTelegramCaption(publishChatMessage);
-            string parameters = publishingChannelParameters.Count > 0 ? $"?photo={photo}&caption={caption}&" : string.Empty;
+            string parameters = publishingChannelParameters.Count > 0 ? $"?photo={Uri.EscapeDataString(photo)}&caption={caption}&" : string.Empty;
 
             for (int index = 0; index < publishingChannelParameters.Count; index++)
             {
-                parameters += $"{publishingChannelParameters[index].Parameter}={publishingChannelParameters[index].Value}";
+                parameters += $"{publishingChannelParameters[index].Parameter}={Uri.EscapeDataString(publishingChannelParameters[index].Value)}";
                 parameters += (index == publishingChannelParameters.Count - 1 ? string.Empty : "&");
             }
 
@@ -161,11 +164,11 @@ namespace PromoTik.Domain.Services
 
             if (!string.IsNullOrWhiteSpace(publishChatMessage.AditionalMessage))
             {
-                caption.AppendLine($"💥 <b>{Uri.EscapeDataString(publishChatMessage.AditionalMessage)}</b> 💥");
+                caption.AppendLine($"💥 <b>{publishChatMessage.AditionalMessage}</b> 💥");
                 caption.AppendLine();
             }
 
-            caption.AppendLine(Uri.EscapeDataString(publishChatMessage.Title));
+            caption.AppendLine(publishChatMessage.Title);
             caption.AppendLine();
 
             if (publishChatMessage.ValueWithouDiscount > publishChatMessage.Value)
@@ -184,10 +187,10 @@ namespace PromoTik.Domain.Services
                 caption.AppendLine();
             }
 
-            string link = Uri.EscapeDataString(publishChatMessage.ShortLink);
+            string link = publishChatMessage.ShortLink;
             caption.AppendLine($"⭐ Acesse aqui: <a href=\'{link}\'>{link}</a>");
 
-            return caption.ToString();
+            return Uri.EscapeDataString(caption.ToString());
         }
     }
 }

@@ -18,8 +18,6 @@ namespace PromoTik.Domain.Interfaces.Repositories.Scheduled
 
         LineExecution? Update(LineExecution lineExecution);
 
-        LineExecution? UpdateExecution(int ID);
-
         bool SaveChanges();
     }
 }

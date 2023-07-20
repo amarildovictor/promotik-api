@@ -58,28 +58,46 @@ namespace PromoTik.Domain.Services.Scheduled
 
         private async Task DoWorkLineExecution(object? state)
         {
-            using (var scope = _serviceScopeFactory.CreateScope())
+            try
             {
-                ILineExecutionService lineExecutionService;
-                lineExecutionService = scope.ServiceProvider.GetRequiredService<ILineExecutionService>();
-
-                LineExecution? lineExecution = await lineExecutionService.GetNext();
-
-                if (lineExecution != null && lineExecution.PublishChatMessage != null)
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    IAppsConnectionControlService appsConnectionControlService;
-                    appsConnectionControlService = scope.ServiceProvider.GetRequiredService<IAppsConnectionControlService>();
+                    ILineExecutionService lineExecutionService;
+                    lineExecutionService = scope.ServiceProvider.GetRequiredService<ILineExecutionService>();
 
-                    if (await appsConnectionControlService.PublishMessageToApps(lineExecution.PublishChatMessage) == null)
+                    LineExecution? lineExecution = await lineExecutionService.GetNext();
+
+                    if (lineExecution != null && lineExecution.PublishChatMessage != null)
                     {
-                        lineExecutionService.UpdateExecution(lineExecution.ID);
+                        IAppsConnectionControlService appsConnectionControlService;
+                        appsConnectionControlService = scope.ServiceProvider.GetRequiredService<IAppsConnectionControlService>();
+
+                        try
+                        {
+                            lineExecution.ExecutionDate = DateTime.Now;
+
+                            if (await appsConnectionControlService.PublishMessageToApps(lineExecution.PublishChatMessage) == null)
+                            {
+                                lineExecutionService.Update(lineExecution);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            lineExecution.Priority = -99;
+                            lineExecutionService.Update(lineExecution);
+                            throw new Exception($"Erro na fila com ID: {lineExecution.ID}.", ex);
+                        }
                     }
+
+                    var count = Interlocked.Increment(ref executionCount);
+
+                    _logger.LogInformation(
+                        "Timed Hosted Service is working. Line execution count: {Count}", count);
                 }
-
-                var count = Interlocked.Increment(ref executionCount);
-
-                _logger.LogInformation(
-                    "Timed Hosted Service is working. Line execution count: {Count}", count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
             }
         }
 

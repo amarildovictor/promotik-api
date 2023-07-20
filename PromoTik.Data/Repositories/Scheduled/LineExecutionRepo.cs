@@ -54,20 +54,6 @@ namespace PromoTik.Data.Repositories.Scheduled
             return Context?.Update(lineExecution).Entity;
         }
 
-        public LineExecution? UpdateExecution(int ID)
-        {
-            LineExecution? lineExecution = GetById(ID);
-
-            if (lineExecution != null)
-            {
-                lineExecution.ExecutionDate = DateTime.Now;
-
-                return Context?.Update(lineExecution).Entity;
-            }
-
-            return null;
-        }
-
         public bool SaveChanges()
         {
             try

@@ -69,17 +69,6 @@ namespace PromoTik.Domain.Services.Scheduled
             catch { throw; }
         }
 
-        public LineExecution? UpdateExecution(int ID)
-        {
-            try
-            {
-                LineExecution? lineExecution = LineExecutionRepo.UpdateExecution(ID);
-
-                return LineExecutionRepo.SaveChanges() ? lineExecution : null;
-            }
-            catch { throw; }
-        }
-
         private async Task<LineExecution?> AddNewsLineExecution()
         {
             LineExecution? lineExecution = null;
