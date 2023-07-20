@@ -21,6 +21,7 @@ namespace PromoTik.Data.Mapping.Scheduled
             builder.Property(x => x.CreationDate);
             builder.Property(x => x.ExecutionDate);
             builder.Property(x => x.Type);
+            builder.Property(x => x.Priority);
         }
     }
 }

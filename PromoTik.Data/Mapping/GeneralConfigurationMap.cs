@@ -18,8 +18,8 @@ namespace PromoTik.Data.Mapping
 
             builder.Property(x => x.Description).HasMaxLength(50);
             builder.Property(x => x.Type);
-            builder.Property(x => x.Value1).HasMaxLength(50);
-            builder.Property(x => x.Value2).HasMaxLength(50);
+            builder.Property(x => x.Value1).HasMaxLength(500);
+            builder.Property(x => x.Value2).HasMaxLength(500);
         }
     }
 }

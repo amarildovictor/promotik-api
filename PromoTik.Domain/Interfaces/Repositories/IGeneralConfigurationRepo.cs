@@ -8,6 +8,8 @@ namespace PromoTik.Domain.Interfaces.Repositories
 {
     public interface IGeneralConfigurationRepo
     {
-        GeneralConfiguration? Get(string type);
+        List<GeneralConfiguration>? Get(string type);
+
+        void Update(GeneralConfiguration generalConfiguration);
     }
 }

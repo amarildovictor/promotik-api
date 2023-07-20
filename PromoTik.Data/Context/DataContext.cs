@@ -41,7 +41,7 @@ namespace PromoTik.Data.Context
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new PublishChatMessageMap());
-            modelBuilder.ApplyConfiguration(new PublishChatMessage_PublishingAppMap());
+            modelBuilder.ApplyConfiguration(new PublishChatMessage_PublishingChannelMap());
             modelBuilder.ApplyConfiguration(new PublishChatMessage_WarehouseMap());
             modelBuilder.ApplyConfiguration(new PublishingChannelMap());
             modelBuilder.ApplyConfiguration(new PublishingChannelParametersMap());

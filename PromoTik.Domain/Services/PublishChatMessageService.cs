@@ -23,10 +23,12 @@ namespace PromoTik.Domain.Services
         {
             try
             {
-                var addedPublishChatMessage = PublishChatMessageRepo.Add(publishChatMessage);
-                if (await PublishChatMessageRepo.SaveChangesAsync() && addedPublishChatMessage != null)
+                int? publishChatMessageID = await PublishChatMessageRepo.Add(publishChatMessage);
+                if (publishChatMessageID != null)
                 {
-                    return await AppsConnectionControlService.PublishMessageToApps(addedPublishChatMessage);
+                    PublishChatMessage? publishChatMessageAdded = PublishChatMessageRepo.Get(publishChatMessageID.Value);
+                    if (publishChatMessageAdded != null)
+                        return await AppsConnectionControlService.PublishMessageToApps(publishChatMessageAdded);
                 }
 
                 return null;

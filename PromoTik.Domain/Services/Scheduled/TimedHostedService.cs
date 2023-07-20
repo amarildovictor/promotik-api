@@ -33,11 +33,11 @@ namespace PromoTik.Domain.Services.Scheduled
                     IGeneralConfigurationRepo generalConfigurationRepo;
                     generalConfigurationRepo = scope.ServiceProvider.GetRequiredService<IGeneralConfigurationRepo>();
 
-                    GeneralConfiguration? generalConfiguration = generalConfigurationRepo.Get(Globalization.EXECUTION_TIME_INTERVAL);
+                    List<GeneralConfiguration>? generalConfigurations = generalConfigurationRepo.Get(Globalization.EXECUTION_TIME_INTERVAL);
 
-                    if (generalConfiguration != null)
+                    if (generalConfigurations != null)
                     {
-                        TimeSpan timeSpan = TimeSpan.FromMinutes(Convert.ToInt16(generalConfiguration.Value1));
+                        TimeSpan timeSpan = TimeSpan.FromMinutes(Convert.ToInt16(generalConfigurations.First().Value1));
 
                         _timerLineExecution = new Timer(async (e) => await DoWorkLineExecution(e), null, timeSpan, timeSpan);
 
@@ -63,7 +63,7 @@ namespace PromoTik.Domain.Services.Scheduled
                 ILineExecutionService lineExecutionService;
                 lineExecutionService = scope.ServiceProvider.GetRequiredService<ILineExecutionService>();
 
-                LineExecution? lineExecution = lineExecutionService.GetNext();
+                LineExecution? lineExecution = await lineExecutionService.GetNext();
 
                 if (lineExecution != null && lineExecution.PublishChatMessage != null)
                 {
@@ -79,7 +79,7 @@ namespace PromoTik.Domain.Services.Scheduled
                 var count = Interlocked.Increment(ref executionCount);
 
                 _logger.LogInformation(
-                    "Timed Hosted Service is working to update by year. Count: {Count}", count);
+                    "Timed Hosted Service is working. Line execution count: {Count}", count);
             }
         }
 

@@ -10,7 +10,7 @@ namespace PromoTik.Domain.Interfaces.Services.Scheduled
     {
         LineExecution? GetById(int ID);
 
-        LineExecution? GetNext();
+        Task<LineExecution?> GetNext();
 
         LineExecution? Add(LineExecution lineExecution);
 

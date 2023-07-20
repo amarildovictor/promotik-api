@@ -14,6 +14,8 @@ namespace PromoTik.Domain.Interfaces.Repositories.Scheduled
 
         LineExecution? Add(LineExecution lineExecution);
 
+        void AddRange(List<LineExecution> lineExecutions);
+
         LineExecution? Update(LineExecution lineExecution);
 
         LineExecution? UpdateExecution(int ID);

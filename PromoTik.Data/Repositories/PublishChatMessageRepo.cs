@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using PromoTik.Data.Context;
 using PromoTik.Domain.Entities;
 using PromoTik.Domain.Interfaces.Repositories;
@@ -17,14 +14,16 @@ namespace PromoTik.Data.Repositories
             this.Context = context;
         }
 
-        public PublishChatMessage? Add(PublishChatMessage publishChatMessage)
+        public async Task<int?> Add(PublishChatMessage publishChatMessage)
         {
-            return Context?.Add(publishChatMessage).Entity;
+            Context?.Add(publishChatMessage);
+
+            return await SaveChangesAsync() ? publishChatMessage.ID : null;
         }
 
         public PublishChatMessage? Get(int publishChatMessageID)
         {
-            return Context?.PublishChatMessage?.Where(x => x.ID == publishChatMessageID).FirstOrDefault();
+            return GetIncludes()?.Where(x => x.ID == publishChatMessageID).FirstOrDefault();
         }
 
         public void Remove(int publishChatMessageID)
@@ -42,6 +41,16 @@ namespace PromoTik.Data.Repositories
                 return (Context != null && await Context.SaveChangesAsync() > 0);
             }
             catch { throw; }
+        }
+
+        private IQueryable<PublishChatMessage>? GetIncludes()
+        {
+            return Context?.PublishChatMessage?.Include(i => i.PublishingChannels)!
+                                                .ThenInclude(t => t.PublishingChannel)
+                                                .ThenInclude(t => t!.PublishingChannelParameters)
+                                               .Include(i => i.PublishingChannels)!
+                                                .ThenInclude(t => t.PublishingChannel)
+                                                .ThenInclude(t => t!.PublishingApp);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace PromoTik.Domain.Interfaces.Repositories
 {
     public interface IPublishChatMessageRepo
     {
-        PublishChatMessage? Add(PublishChatMessage publishChatMessage);
+        Task<int?> Add(PublishChatMessage publishChatMessage);
 
         void Remove(int publishChatMessageID);
 

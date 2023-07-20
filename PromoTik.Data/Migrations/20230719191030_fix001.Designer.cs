@@ -12,8 +12,8 @@ using PromoTik.Data.Context;
 namespace PromoTik.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230714194205_firstScript")]
-    partial class firstScript
+    [Migration("20230719191030_fix001")]
+    partial class fix001
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -248,12 +248,12 @@ namespace PromoTik.Data.Migrations
 
                     b.Property<string>("Value1")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Value2")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("ID");
 
@@ -307,14 +307,14 @@ namespace PromoTik.Data.Migrations
                     b.Property<int>("PublishChatMessageID")
                         .HasColumnType("int");
 
-                    b.Property<int>("PublishingAppID")
+                    b.Property<int>("PublishingChannelID")
                         .HasColumnType("int");
 
-                    b.HasKey("PublishChatMessageID", "PublishingAppID");
+                    b.HasKey("PublishChatMessageID", "PublishingChannelID");
 
-                    b.HasIndex("PublishingAppID");
+                    b.HasIndex("PublishingChannelID");
 
-                    b.ToTable("PUBLISHCHATMESSAGE_PUBLISHINGAPP", (string)null);
+                    b.ToTable("PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL", (string)null);
                 });
 
             modelBuilder.Entity("PromoTik.Domain.Entities.PublishChatMessage_Warehouse", b =>
@@ -423,6 +423,9 @@ namespace PromoTik.Data.Migrations
 
                     b.Property<DateTime?>("ExecutionDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
 
                     b.Property<int>("PublishChatMessageID")
                         .HasColumnType("int");
@@ -536,7 +539,7 @@ namespace PromoTik.Data.Migrations
 
                     b.HasOne("PromoTik.Domain.Entities.PublishingChannel", "PublishingChannel")
                         .WithMany("PublishChatMessages")
-                        .HasForeignKey("PublishingAppID")
+                        .HasForeignKey("PublishingChannelID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

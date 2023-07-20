@@ -11,7 +11,7 @@ namespace PromoTik.Domain.Entities
         [JsonIgnore]
         public int PublishChatMessageID { get; set; }
 
-        public required int PublishingAppID { get; set; }
+        public required int PublishingChannelID { get; set; }
 
         [JsonIgnore]
         public PublishChatMessage? PublishChatMessage { get; set; }

@@ -24,10 +24,16 @@ namespace PromoTik.Data.Repositories.Scheduled
             return Context?
                     .LineExecutions?
                     .Include(i => i.PublishChatMessage)
-                    .Include(i => i.PublishChatMessage.PublishingChannels)
-                    .Include(i => i.PublishChatMessage.Warehouses)
+                        .ThenInclude(t => t.Warehouses)
+                    .Include(i => i.PublishChatMessage.PublishingChannels)!
+                        .ThenInclude(t => t.PublishingChannel)
+                        .ThenInclude(t => t!.PublishingChannelParameters)
+                    .Include(i => i.PublishChatMessage.PublishingChannels)!
+                        .ThenInclude(t => t.PublishingChannel)
+                        .ThenInclude(t => t!.PublishingApp)
                     .Where(w => w.ExecutionDate == null)
-                    .OrderBy(x => x.CreationDate)
+                    .OrderBy(x => x.Priority)
+                    .ThenBy(x => x.CreationDate)
                     .ThenBy(x => x.ID)
                     .Take(1).FirstOrDefault();
         }
@@ -35,6 +41,12 @@ namespace PromoTik.Data.Repositories.Scheduled
         public LineExecution? Add(LineExecution lineExecution)
         {
             return Context?.Add(lineExecution).Entity;
+        }
+
+        public void AddRange(List<LineExecution> lineExecutions)
+        {
+            Context?.AddRange(lineExecutions);
+            SaveChanges();
         }
 
         public LineExecution? Update(LineExecution lineExecution)

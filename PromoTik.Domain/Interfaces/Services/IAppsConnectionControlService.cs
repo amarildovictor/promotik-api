@@ -9,5 +9,7 @@ namespace PromoTik.Domain.Interfaces.Services
     public interface IAppsConnectionControlService
     {
         Task<List<string>?> PublishMessageToApps(PublishChatMessage publishChatMessage);
+
+        Task<List<PublishChatMessage>> GetPublishChatMessagesAsync(string url, string amazonTag);
     }
 }

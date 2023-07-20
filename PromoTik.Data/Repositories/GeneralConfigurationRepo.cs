@@ -17,9 +17,15 @@ namespace PromoTik.Data.Repositories
             this.Context = context;
         }
 
-        public GeneralConfiguration? Get(string type)
+        public List<GeneralConfiguration>? Get(string type)
         {
-            return Context?.GeneralConfigurations?.Where(x => x.Type == type).FirstOrDefault();
+            return Context?.GeneralConfigurations?.Where(x => x.Type == type).ToList();
+        }
+
+        public void Update(GeneralConfiguration generalConfiguration)
+        {
+            Context?.Update(generalConfiguration);
+            Context?.SaveChanges();
         }
     }
 }

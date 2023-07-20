@@ -21,5 +21,7 @@ namespace PromoTik.Domain.Entities.Scheduled
         public DateTime? ExecutionDate { get; set; }
 
         public ExecutionTypes Type { get; set; }
+
+        public int Priority { get; set; }
     }
 }

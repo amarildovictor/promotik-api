@@ -309,23 +309,23 @@ namespace PromoTik.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PUBLISHCHATMESSAGE_PUBLISHINGAPP",
+                name: "PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL",
                 columns: table => new
                 {
                     PublishChatMessageID = table.Column<int>(type: "int", nullable: false),
-                    PublishingAppID = table.Column<int>(type: "int", nullable: false)
+                    PublishingChannelID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PUBLISHCHATMESSAGE_PUBLISHINGAPP", x => new { x.PublishChatMessageID, x.PublishingAppID });
+                    table.PrimaryKey("PK_PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL", x => new { x.PublishChatMessageID, x.PublishingChannelID });
                     table.ForeignKey(
-                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PUBLISHING_CHANNEL_PublishingAppID",
-                        column: x => x.PublishingAppID,
+                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL_PUBLISHING_CHANNEL_PublishingChannelID",
+                        column: x => x.PublishingChannelID,
                         principalTable: "PUBLISHING_CHANNEL",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PUBLISH_CHAT_MESSAGE_PublishChatMessageID",
+                        name: "FK_PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL_PUBLISH_CHAT_MESSAGE_PublishChatMessageID",
                         column: x => x.PublishChatMessageID,
                         principalTable: "PUBLISH_CHAT_MESSAGE",
                         principalColumn: "ID",
@@ -397,9 +397,9 @@ namespace PromoTik.Data.Migrations
                 column: "PublishChatMessageID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PUBLISHCHATMESSAGE_PUBLISHINGAPP_PublishingAppID",
-                table: "PUBLISHCHATMESSAGE_PUBLISHINGAPP",
-                column: "PublishingAppID");
+                name: "IX_PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL_PublishingChannelID",
+                table: "PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL",
+                column: "PublishingChannelID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PUBLISHCHATMESSAGE_WAREHOUSE_WarehouseID",
@@ -444,7 +444,7 @@ namespace PromoTik.Data.Migrations
                 name: "GENERAL_CONFIGURATION");
 
             migrationBuilder.DropTable(
-                name: "PUBLISHCHATMESSAGE_PUBLISHINGAPP");
+                name: "PUBLISHCHATMESSAGE_PUBLISHINGCHANNEL");
 
             migrationBuilder.DropTable(
                 name: "PUBLISHCHATMESSAGE_WAREHOUSE");
