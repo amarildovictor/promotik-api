@@ -77,50 +77,53 @@ namespace PromoTik.Domain.Services
 
                         document.LoadHtml(result);
 
-                        var productNodes = document.DocumentNode.SelectSingleNode("//div[@id='gridItemRoot']").ParentNode;
+                        var productNodes = document.DocumentNode.SelectSingleNode("//div[@id='gridItemRoot']");
 
-                        foreach (var productNode in productNodes.ChildNodes)
+                        if (productNodes != null)
                         {
-                            if (productNode != null)
+                            foreach (var productNode in productNodes.ParentNode.ChildNodes)
                             {
-                                HtmlDocument node = new HtmlDocument();
-                                node.LoadHtml(productNode.InnerHtml);
-
-                                HtmlNode? firstHrefNode = node.DocumentNode.SelectSingleNode("//a[@class='a-link-normal']");
-                                string? href = firstHrefNode.Attributes["href"].Value;
-
-                                if (!string.IsNullOrWhiteSpace(href))
+                                if (productNode != null)
                                 {
-                                    HtmlNode? imgNode = firstHrefNode.SelectSingleNode("//img");
-                                    string? title = imgNode?.Attributes["alt"].Value;
-                                    string? imageUri = imgNode?.Attributes["src"].Value;
+                                    HtmlDocument node = new HtmlDocument();
+                                    node.LoadHtml(productNode.InnerHtml);
 
-                                    HtmlNode? priceNode = node.DocumentNode.SelectSingleNode("//span[@class='a-size-base a-color-price']");
-                                    string? price = priceNode?.InnerText;
+                                    HtmlNode? firstHrefNode = node.DocumentNode.SelectSingleNode("//a[@class='a-link-normal']");
+                                    string? href = firstHrefNode.Attributes["href"].Value;
 
-                                    href = $"https://www.amazon.es{href}&tag={amazonTag}";
-                                    _ = decimal.TryParse(price?.Replace("€", "").Trim(), out decimal priceParse);
-
-                                    if (!string.IsNullOrWhiteSpace(title) &&
-                                        !string.IsNullOrWhiteSpace(imageUri) &&
-                                        priceParse > 0 &&
-                                        !publishChatMessages.Exists(x => x.Title == title))
+                                    if (!string.IsNullOrWhiteSpace(href))
                                     {
-                                        publishChatMessages.Add(new PublishChatMessage
+                                        HtmlNode? imgNode = firstHrefNode.SelectSingleNode("//img");
+                                        string? title = imgNode?.Attributes["alt"].Value;
+                                        string? imageUri = imgNode?.Attributes["src"].Value;
+
+                                        HtmlNode? priceNode = node.DocumentNode.SelectSingleNode("//span[@class='a-size-base a-color-price']");
+                                        string? price = priceNode?.InnerText;
+
+                                        href = $"https://www.amazon.es{href}&tag={amazonTag}";
+                                        _ = decimal.TryParse(price?.Replace("€", "").Trim(), out decimal priceParse);
+
+                                        if (!string.IsNullOrWhiteSpace(title) &&
+                                            !string.IsNullOrWhiteSpace(imageUri) &&
+                                            priceParse > 0 &&
+                                            !publishChatMessages.Exists(x => x.Title == title))
                                         {
-                                            Title = title ?? string.Empty,
-                                            Link = href,
-                                            ShortLink = href,
-                                            ImageLink = imageUri,
-                                            Value = priceParse,
-                                            AditionalMessage = "Amazon ES",
-                                            PublishingChannels = new List<PublishChatMessage_PublishingChannel> {
+                                            publishChatMessages.Add(new PublishChatMessage
+                                            {
+                                                Title = title ?? string.Empty,
+                                                Link = href,
+                                                ShortLink = href,
+                                                ImageLink = imageUri,
+                                                Value = priceParse,
+                                                AditionalMessage = "Amazon ES",
+                                                PublishingChannels = new List<PublishChatMessage_PublishingChannel> {
                                                 new PublishChatMessage_PublishingChannel { PublishingChannelID = 1 }
                                             },
-                                            Warehouses = new List<PublishChatMessage_Warehouse> {
+                                                Warehouses = new List<PublishChatMessage_Warehouse> {
                                                 new PublishChatMessage_Warehouse { WarehouseID = 1 }
                                             }
-                                        });
+                                            });
+                                        }
                                     }
                                 }
                             }

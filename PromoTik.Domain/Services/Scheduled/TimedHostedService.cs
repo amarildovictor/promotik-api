@@ -39,7 +39,7 @@ namespace PromoTik.Domain.Services.Scheduled
                     {
                         TimeSpan timeSpan = TimeSpan.FromMinutes(Convert.ToInt16(generalConfigurations.First().Value1));
 
-                        _timerLineExecution = new Timer(async (e) => await DoWorkLineExecution(e), null, timeSpan, timeSpan);
+                        _timerLineExecution = new Timer(async (e) => await DoWorkLineExecution(e), null, TimeSpan.Zero, timeSpan);
 
                         return Task.CompletedTask;
                     }

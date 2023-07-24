@@ -84,7 +84,7 @@ namespace PromoTik.Domain.Services.Scheduled
             {
                 if (generalConfigurationCurrentPage != null && amazonTag != null && currentPage <= maxPage)
                 {
-                    var url = $"{generalConfigurationAmazonUrl.Value1}&tag={amazonTag}&pg={currentPage}";
+                    var url = $"{generalConfigurationAmazonUrl.Value1}?tag={amazonTag}&pg={currentPage}";
 
                     List<PublishChatMessage> publishChatMessages = await AppsConnectionControlService.GetPublishChatMessagesAsync(url, amazonTag);
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PromoTik.Domain.Entities.Scheduled;
 using PromoTik.Domain.Interfaces.Services.Scheduled;
@@ -20,6 +21,7 @@ namespace PromoTik.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Post([FromBody] LineExecution lineExecution)
         {
             try
@@ -38,6 +40,7 @@ namespace PromoTik.API.Controllers
 
         [HttpGet]
         [Route("anonimo")]
+        [AllowAnonymous]
         public IActionResult Anonimo()
         {
             return Ok("Tem permissão!");
