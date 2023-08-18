@@ -31,15 +31,15 @@ namespace PromoTik.Domain.Services.Scheduled
             catch { throw; }
         }
 
-        public async Task<LineExecution?> GetNext()
+        public async Task<LineExecution?> GetNext(PublishingChannel channel)
         {
             try
             {
-                LineExecution? lineExecution = LineExecutionRepo.GetNext();
+                LineExecution? lineExecution = LineExecutionRepo.GetNext(channel.ID);
 
                 if (lineExecution == null)
                 {
-                    lineExecution = await AddNewsLineExecution();
+                    lineExecution = await AddNewsLineExecution(channel);
                 }
 
                 return lineExecution;
@@ -69,24 +69,26 @@ namespace PromoTik.Domain.Services.Scheduled
             catch { throw; }
         }
 
-        private async Task<LineExecution?> AddNewsLineExecution()
+        private async Task<LineExecution?> AddNewsLineExecution(PublishingChannel channel)
         {
             LineExecution? lineExecution = null;
             List<LineExecution> lineExecutions = new List<LineExecution>();
+            string channelId = channel.ID.ToString();
 
-            List<GeneralConfiguration>? generalConfigurationAmazonUrls = GeneralConfigurationRepo.Get(Globalization.AMAZON_URL_EXECUTION);
-            string? amazonTag = GeneralConfigurationRepo.Get(Globalization.AFFILIATED_AMAZON_TAG)?.FirstOrDefault()?.Value1;
-            GeneralConfiguration? generalConfigurationCurrentPage = GeneralConfigurationRepo.Get(Globalization.CURRENT_PAGE)?.FirstOrDefault();
+            List<GeneralConfiguration>? generalConfigurationAmazonUrls = GeneralConfigurationRepo.GetByValue2(Globalization.AMAZON_URL_EXECUTION, channelId);
+            string? amazonTag = GeneralConfigurationRepo.GetByValue2(Globalization.AFFILIATED_AMAZON_TAG, channelId)?.FirstOrDefault()?.Value1;
+            GeneralConfiguration? generalConfigurationCurrentPage = GeneralConfigurationRepo.GetByValue2(Globalization.CURRENT_PAGE, channelId)?.FirstOrDefault();
             _ = int.TryParse(generalConfigurationCurrentPage?.Value1, out int currentPage);
-            _ = int.TryParse(GeneralConfigurationRepo.Get(Globalization.MAX_PAGE)?.FirstOrDefault()?.Value1, out int maxPage);
+            _ = int.TryParse(GeneralConfigurationRepo.GetByValue2(Globalization.MAX_PAGE, channelId)?.FirstOrDefault()?.Value1, out int maxPage);
 
             foreach (GeneralConfiguration generalConfigurationAmazonUrl in generalConfigurationAmazonUrls ?? new List<GeneralConfiguration>())
             {
                 if (generalConfigurationCurrentPage != null && amazonTag != null && currentPage <= maxPage)
                 {
-                    var url = $"{generalConfigurationAmazonUrl.Value1}?tag={amazonTag}&pg={currentPage}";
+                    var url = $"{generalConfigurationAmazonUrl.Value1}?tag={amazonTag}";
+                    url += currentPage > 1 ? $"&pg={currentPage}" : string.Empty;
 
-                    List<PublishChatMessage> publishChatMessages = await AppsConnectionControlService.GetPublishChatMessagesAsync(url, amazonTag);
+                    List<PublishChatMessage> publishChatMessages = await AppsConnectionControlService.GetPublishChatMessagesAsync(url, amazonTag, channel);
 
                     for (int i = 0; i < publishChatMessages.Count; i++)
                     {
@@ -114,7 +116,7 @@ namespace PromoTik.Domain.Services.Scheduled
 
             if (generalConfigurationAmazonUrls?.Count > 0)
             {
-                lineExecution = LineExecutionRepo.GetNext();
+                lineExecution = LineExecutionRepo.GetNext(channel.ID);
             }
 
             return lineExecution;

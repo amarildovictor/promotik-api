@@ -10,7 +10,7 @@ namespace PromoTik.Domain.Interfaces.Repositories.Scheduled
     {
         LineExecution? GetById(int ID);
 
-        LineExecution? GetNext();
+        LineExecution? GetNext(int channelId);
 
         LineExecution? Add(LineExecution lineExecution);
 

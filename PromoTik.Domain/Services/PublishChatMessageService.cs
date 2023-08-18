@@ -46,6 +46,15 @@ namespace PromoTik.Domain.Services
             catch { throw; }
         }
 
+        public void RemoveOldItens()
+        {
+            try
+            {
+                PublishChatMessageRepo.RemoveOldItens();
+            }
+            catch { throw; }
+        }
+
         public PublishChatMessage? Get(int publishChatMessageID)
         {
             try

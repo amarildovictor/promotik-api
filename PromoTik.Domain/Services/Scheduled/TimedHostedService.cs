@@ -15,6 +15,7 @@ namespace PromoTik.Domain.Services.Scheduled
         private readonly ILogger<TimedHostedService> _logger;
         private IServiceScopeFactory _serviceScopeFactory;
         private Timer? _timerLineExecution = null;
+        private Timer? _timerRemoveOldChats = null;
 
         public TimedHostedService(ILogger<TimedHostedService> logger, IServiceScopeFactory serviceScopeFactory)
         {
@@ -37,9 +38,10 @@ namespace PromoTik.Domain.Services.Scheduled
 
                     if (generalConfigurations != null)
                     {
-                        TimeSpan timeSpan = TimeSpan.FromMinutes(Convert.ToInt16(generalConfigurations.First().Value1));
+                        TimeSpan timeSpanLineExecution = TimeSpan.FromMinutes(Convert.ToInt16(generalConfigurations.First().Value1));
 
-                        _timerLineExecution = new Timer(async (e) => await DoWorkLineExecution(e), null, TimeSpan.Zero, timeSpan);
+                        _timerRemoveOldChats = new Timer((e) => DoWorkRemoveOldChats(e), null, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
+                        _timerLineExecution = new Timer(async (e) => await DoWorkLineExecution(e), null, TimeSpan.Zero, timeSpanLineExecution);
 
                         return Task.CompletedTask;
                     }
@@ -62,30 +64,37 @@ namespace PromoTik.Domain.Services.Scheduled
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    ILineExecutionService lineExecutionService;
-                    lineExecutionService = scope.ServiceProvider.GetRequiredService<ILineExecutionService>();
+                    IPublishingChannelService publishingChannelService;
+                    publishingChannelService = scope.ServiceProvider.GetRequiredService<IPublishingChannelService>();
+                    List<PublishingChannel> publishingChannels = publishingChannelService.GetAll() ?? new List<PublishingChannel>();
 
-                    LineExecution? lineExecution = await lineExecutionService.GetNext();
-
-                    if (lineExecution != null && lineExecution.PublishChatMessage != null)
+                    foreach (PublishingChannel publishingChannel in publishingChannels)
                     {
-                        IAppsConnectionControlService appsConnectionControlService;
-                        appsConnectionControlService = scope.ServiceProvider.GetRequiredService<IAppsConnectionControlService>();
+                        ILineExecutionService lineExecutionService;
+                        lineExecutionService = scope.ServiceProvider.GetRequiredService<ILineExecutionService>();
 
-                        try
+                        LineExecution? lineExecution = await lineExecutionService.GetNext(publishingChannel);
+
+                        if (lineExecution != null && lineExecution.PublishChatMessage != null)
                         {
-                            lineExecution.ExecutionDate = DateTime.Now;
+                            IAppsConnectionControlService appsConnectionControlService;
+                            appsConnectionControlService = scope.ServiceProvider.GetRequiredService<IAppsConnectionControlService>();
 
-                            if (await appsConnectionControlService.PublishMessageToApps(lineExecution.PublishChatMessage) == null)
+                            try
                             {
-                                lineExecutionService.Update(lineExecution);
+                                lineExecution.ExecutionDate = DateTime.Now;
+
+                                if (await appsConnectionControlService.PublishMessageToApps(lineExecution.PublishChatMessage) == null)
+                                {
+                                    lineExecutionService.Update(lineExecution);
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            lineExecution.Priority = -99;
-                            lineExecutionService.Update(lineExecution);
-                            throw new Exception($"Erro na fila com ID: {lineExecution.ID}.", ex);
+                            catch (Exception ex)
+                            {
+                                lineExecution.Priority = -99;
+                                lineExecutionService.Update(lineExecution);
+                                throw new Exception($"Erro na fila com ID: {lineExecution.ID}.", ex);
+                            }
                         }
                     }
 
@@ -94,6 +103,26 @@ namespace PromoTik.Domain.Services.Scheduled
                     _logger.LogInformation(
                         "Timed Hosted Service is working. Line execution count: {Count}", count);
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+            }
+        }
+
+        private void DoWorkRemoveOldChats(object? state)
+        {
+            try
+            {
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    IPublishChatMessageService publishChatMessageService;
+                    publishChatMessageService = scope.ServiceProvider.GetRequiredService<IPublishChatMessageService>();
+
+                    publishChatMessageService.RemoveOldItens();
+                }
+
+                _logger.LogInformation("Old Chats removed successfully.");
             }
             catch (Exception ex)
             {

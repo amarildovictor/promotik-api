@@ -10,6 +10,8 @@ namespace PromoTik.Domain.Interfaces.Repositories
     {
         List<GeneralConfiguration>? Get(string type);
 
+        List<GeneralConfiguration>? GetByValue2(string type, string value2);
+
         void Update(GeneralConfiguration generalConfiguration);
     }
 }

@@ -12,6 +12,8 @@ namespace PromoTik.Domain.Interfaces.Services
 
         Task Remove(int publishChatMessageID);
 
+        void RemoveOldItens();
+
         PublishChatMessage? Get(int publishChatMessageID);
     }
 }

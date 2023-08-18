@@ -14,6 +14,8 @@ namespace PromoTik.Domain.Interfaces.Repositories
 
         PublishChatMessage? Get(int publishChatMessageID);
 
+        void RemoveOldItens();
+
         Task<bool> SaveChangesAsync();
     }
 }

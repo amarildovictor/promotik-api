@@ -20,6 +20,7 @@ namespace PromoTik.Data.Mapping
 
             builder.Property(x => x.Description).HasMaxLength(256);
             builder.Property(x => x.Channel_ID).HasMaxLength(256);
+            builder.Property(x => x.Country);
         }
     }
 }

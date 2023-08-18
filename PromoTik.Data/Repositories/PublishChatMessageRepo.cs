@@ -34,6 +34,17 @@ namespace PromoTik.Data.Repositories
                 Context?.PublishChatMessage?.Remove(p);
         }
 
+        public void RemoveOldItens()
+        {
+            var chatsToRemove = Context?.LineExecutions?.Where(w => w.ExecutionDate == null).Select(s => s.PublishChatMessage);
+            
+            if (chatsToRemove != null)
+            {
+                Context?.PublishChatMessage?.RemoveRange(chatsToRemove);
+                Context?.SaveChanges();
+            }
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             try

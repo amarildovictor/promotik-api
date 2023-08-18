@@ -19,19 +19,22 @@ namespace PromoTik.Data.Repositories.Scheduled
             return Context?.LineExecutions?.Where(w => w.ID == ID).FirstOrDefault();
         }
 
-        public LineExecution? GetNext()
+        public LineExecution? GetNext(int channelId)
         {
             return Context?
                     .LineExecutions?
                     .Include(i => i.PublishChatMessage)
                         .ThenInclude(t => t.Warehouses)
-                    .Include(i => i.PublishChatMessage.PublishingChannels)!
+                    .Include(i => i.PublishChatMessage.PublishingChannels!)
                         .ThenInclude(t => t.PublishingChannel)
                         .ThenInclude(t => t!.PublishingChannelParameters)
-                    .Include(i => i.PublishChatMessage.PublishingChannels)!
+                    .Include(i => i.PublishChatMessage.PublishingChannels!)
                         .ThenInclude(t => t.PublishingChannel)
                         .ThenInclude(t => t!.PublishingApp)
-                    .Where(w => w.ExecutionDate == null)
+                    .Where(w => 
+                        w.ExecutionDate == null &&
+                        w.PublishChatMessage.PublishingChannels!.Where(wh => wh.PublishingChannelID == channelId).FirstOrDefault()!.PublishingChannelID == channelId
+                    )
                     .OrderBy(x => x.Priority)
                     .ThenBy(x => x.CreationDate)
                     .ThenBy(x => x.ID)

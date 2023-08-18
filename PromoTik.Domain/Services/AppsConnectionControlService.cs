@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json.Linq;
 using PromoTik.Domain.Entities;
+using PromoTik.Domain.Enum;
 using PromoTik.Domain.Interfaces.Repositories;
 using PromoTik.Domain.Interfaces.Services;
 
@@ -58,78 +59,89 @@ namespace PromoTik.Domain.Services
             catch { throw; }
         }
 
-        public async Task<List<PublishChatMessage>> GetPublishChatMessagesAsync(string url, string amazonTag)
+        public async Task<List<PublishChatMessage>> GetPublishChatMessagesAsync(string url, string amazonTag, PublishingChannel channel)
         {
             try
             {
                 HttpClient client = new HttpClient();
                 List<PublishChatMessage> publishChatMessages = new List<PublishChatMessage>();
+                bool isSuccessStatusCode = true;
+                short count = 0;
 
-                using (var response = await client.GetAsync(url))
+                do
                 {
-                    response.EnsureSuccessStatusCode();
-
-                    string result = await response.Content.ReadAsStringAsync();
-
-                    if (response.IsSuccessStatusCode)
+                    using (var response = await client.GetAsync(url))
                     {
-                        HtmlDocument document = new HtmlDocument();
+                        string result = await response.Content.ReadAsStringAsync();
+                        isSuccessStatusCode = response.IsSuccessStatusCode;
 
-                        document.LoadHtml(result);
-
-                        var productNodes = document.DocumentNode.SelectSingleNode("//div[@id='gridItemRoot']");
-
-                        if (productNodes != null)
+                        if (isSuccessStatusCode)
                         {
-                            foreach (var productNode in productNodes.ParentNode.ChildNodes)
+                            HtmlDocument document = new HtmlDocument();
+
+                            document.LoadHtml(result);
+
+                            var productNodes = document.DocumentNode.SelectSingleNode("//div[@id='gridItemRoot']");
+
+                            if (productNodes != null)
                             {
-                                if (productNode != null)
+                                foreach (var productNode in productNodes.ParentNode.ChildNodes)
                                 {
-                                    HtmlDocument node = new HtmlDocument();
-                                    node.LoadHtml(productNode.InnerHtml);
-
-                                    HtmlNode? firstHrefNode = node.DocumentNode.SelectSingleNode("//a[@class='a-link-normal']");
-                                    string? href = firstHrefNode.Attributes["href"].Value;
-
-                                    if (!string.IsNullOrWhiteSpace(href))
+                                    if (productNode != null)
                                     {
-                                        HtmlNode? imgNode = firstHrefNode.SelectSingleNode("//img");
-                                        string? title = imgNode?.Attributes["alt"].Value;
-                                        string? imageUri = imgNode?.Attributes["src"].Value;
+                                        HtmlDocument node = new HtmlDocument();
+                                        node.LoadHtml(productNode.InnerHtml);
 
-                                        HtmlNode? priceNode = node.DocumentNode.SelectSingleNode("//span[@class='a-size-base a-color-price']");
-                                        string? price = priceNode?.InnerText;
+                                        HtmlNode? firstHrefNode = node.DocumentNode.SelectSingleNode("//a[@class='a-link-normal']");
+                                        string? href = firstHrefNode?.Attributes["href"]?.Value;
 
-                                        href = $"https://www.amazon.es{href}&tag={amazonTag}";
-                                        _ = decimal.TryParse(price?.Replace("€", "").Trim(), out decimal priceParse);
-
-                                        if (!string.IsNullOrWhiteSpace(title) &&
-                                            !string.IsNullOrWhiteSpace(imageUri) &&
-                                            priceParse > 0 &&
-                                            !publishChatMessages.Exists(x => x.Title == title))
+                                        if (!string.IsNullOrWhiteSpace(href))
                                         {
-                                            publishChatMessages.Add(new PublishChatMessage
+                                            HtmlNode? imgNode = firstHrefNode?.SelectSingleNode("//img");
+                                            string? title = imgNode?.Attributes["alt"].Value;
+                                            string? imageUri = imgNode?.Attributes["src"].Value;
+
+                                            HtmlNode? priceNode = node.DocumentNode.SelectSingleNode("//span[@class='a-size-base a-color-price']");
+                                            string? price = priceNode?.InnerText;
+
+                                            string amazonDomain = channel.Country == Enum.CountryEnum.Brasil ? "https://www.amazon.com.br" : "https://www.amazon.es";
+                                            href = $"{amazonDomain}{href}&tag={amazonTag}";
+
+                                            string simbolToReplace = channel.Country == Enum.CountryEnum.Brasil ? "R$" : "€";
+                                            _ = decimal.TryParse(price?.Replace(simbolToReplace, "").Trim(), new CultureInfo("pt-PT"),out decimal priceParse);
+
+                                            if (!string.IsNullOrWhiteSpace(title) &&
+                                                !string.IsNullOrWhiteSpace(imageUri) &&
+                                                priceParse > 0 &&
+                                                !publishChatMessages.Exists(x => x.Title == title))
                                             {
-                                                Title = title ?? string.Empty,
-                                                Link = href,
-                                                ShortLink = href,
-                                                ImageLink = imageUri,
-                                                Value = priceParse,
-                                                AditionalMessage = "Amazon ES",
-                                                PublishingChannels = new List<PublishChatMessage_PublishingChannel> {
-                                                new PublishChatMessage_PublishingChannel { PublishingChannelID = 1 }
-                                            },
-                                                Warehouses = new List<PublishChatMessage_Warehouse> {
-                                                new PublishChatMessage_Warehouse { WarehouseID = 1 }
+                                                publishChatMessages.Add(new PublishChatMessage
+                                                {
+                                                    Title = title ?? string.Empty,
+                                                    Link = href,
+                                                    ShortLink = href,
+                                                    ImageLink = imageUri,
+                                                    Value = priceParse,
+                                                    AditionalMessage = channel.Country == Enum.CountryEnum.Brasil ? "Amazon Brasil" : "Amazon ES",
+                                                    PublishingChannels = new List<PublishChatMessage_PublishingChannel> {
+                                                    new PublishChatMessage_PublishingChannel { PublishingChannelID = channel.ID }
+                                                },
+                                                    Warehouses = new List<PublishChatMessage_Warehouse> {
+                                                    new PublishChatMessage_Warehouse { WarehouseID = 1 }
+                                                }
+                                                });
                                             }
-                                            });
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
+
+                    //Tenta sair do erro 429 (Too Many Requests) com 3 tentativas
+                    count++;
+                    if (!isSuccessStatusCode) Thread.Sleep(5000);
+                } while (!isSuccessStatusCode && count <= 3);
 
                 return publishChatMessages;
             }
@@ -149,7 +161,7 @@ namespace PromoTik.Domain.Services
         {
             List<PublishingChannelParameter> publishingChannelParameters = publishingChannel.PublishingChannelParameters ?? new List<PublishingChannelParameter>();
             string photo = publishChatMessage.ImageLink ?? string.Empty;
-            string? caption = GetTelegramCaption(publishChatMessage);
+            string? caption = GetTelegramCaption(publishChatMessage, publishingChannel.Country ?? CountryEnum.Portugal);
             string parameters = publishingChannelParameters.Count > 0 ? $"?photo={Uri.EscapeDataString(photo)}&caption={caption}&" : string.Empty;
 
             for (int index = 0; index < publishingChannelParameters.Count; index++)
@@ -161,9 +173,10 @@ namespace PromoTik.Domain.Services
             return parameters;
         }
 
-        private string GetTelegramCaption(PublishChatMessage publishChatMessage)
+        private string GetTelegramCaption(PublishChatMessage publishChatMessage, CountryEnum countryEnum)
         {
             StringBuilder caption = new StringBuilder();
+            CultureInfo cultureInfo = countryEnum == CountryEnum.Portugal ? new CultureInfo("pt-PT") : new CultureInfo("pt-BR");
 
             if (!string.IsNullOrWhiteSpace(publishChatMessage.AditionalMessage))
             {
@@ -178,10 +191,10 @@ namespace PromoTik.Domain.Services
             {
                 decimal discount = decimal.Round((publishChatMessage.ValueWithouDiscount - publishChatMessage.Value) / (publishChatMessage.ValueWithouDiscount / 100), 1);
                 caption.AppendLine($"DESCONTO DE <b>{discount}%</b>. CONFIRA:");
-                caption.AppendLine($"🔒 De: <s>{string.Format(new CultureInfo("pt-PT"), "{0:C}", publishChatMessage.ValueWithouDiscount)}</s>");
+                caption.AppendLine($"🔒 De: <s>{string.Format(cultureInfo, "{0:C}", publishChatMessage.ValueWithouDiscount)}</s>");
             }
 
-            caption.AppendLine($"💲 <b>Por: {string.Format(new CultureInfo("pt-PT"), "{0:C}", publishChatMessage.Value)}</b>");
+            caption.AppendLine($"💲 <b>Por: {string.Format(cultureInfo, "{0:C}", publishChatMessage.Value)}</b>");
             caption.AppendLine();
 
             if (!string.IsNullOrWhiteSpace(publishChatMessage.Coupon))

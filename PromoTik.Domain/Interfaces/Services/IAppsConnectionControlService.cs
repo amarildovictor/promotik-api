@@ -10,6 +10,6 @@ namespace PromoTik.Domain.Interfaces.Services
     {
         Task<List<string>?> PublishMessageToApps(PublishChatMessage publishChatMessage);
 
-        Task<List<PublishChatMessage>> GetPublishChatMessagesAsync(string url, string amazonTag);
+        Task<List<PublishChatMessage>> GetPublishChatMessagesAsync(string url, string amazonTag, PublishingChannel channel);
     }
 }

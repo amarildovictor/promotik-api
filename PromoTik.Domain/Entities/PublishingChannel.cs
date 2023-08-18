@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using PromoTik.Domain.Enum;
 
 namespace PromoTik.Domain.Entities
 {
@@ -20,5 +21,7 @@ namespace PromoTik.Domain.Entities
         public PublishingApp? PublishingApp { get; set; }
 
         public List<PublishingChannelParameter>? PublishingChannelParameters { get; set; }
+
+        public CountryEnum? Country { get; set; }
     }
 }

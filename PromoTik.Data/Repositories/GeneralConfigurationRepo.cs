@@ -22,6 +22,16 @@ namespace PromoTik.Data.Repositories
             return Context?.GeneralConfigurations?.Where(x => x.Type == type).ToList();
         }
 
+        /// <summary>
+        /// Temporary methos
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public List<GeneralConfiguration>? GetByValue2(string type, string value2)
+        {
+            return Context?.GeneralConfigurations?.Where(x => x.Type == type && x.Value2 == value2).ToList();
+        }
+
         public void Update(GeneralConfiguration generalConfiguration)
         {
             Context?.Update(generalConfiguration);
