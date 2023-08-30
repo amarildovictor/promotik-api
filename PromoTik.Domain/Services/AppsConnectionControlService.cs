@@ -204,7 +204,8 @@ namespace PromoTik.Domain.Services
             }
 
             string link = publishChatMessage.ShortLink;
-            caption.AppendLine($"⭐ Acesse aqui: <a href=\'{link}\'>{link}</a>");
+            caption.AppendLine($"⭐ Acesse aqui: ");
+            caption.AppendLine($"<a href=\'{link}\'>{link}</a>");
 
             return Uri.EscapeDataString(caption.ToString());
         }
